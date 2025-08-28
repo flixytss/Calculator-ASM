@@ -1,16 +1,32 @@
 section .data
 
-smg: db "Hola Mundo", 0
+_alloc: db 0
+_zero: db 0x0
+
+section .bss
+global MEMORY
+MEMORY: resb 1024
 
 section .text
-
 _start:
-    mov rax, 4
-    mov ebx, 1
-    mov ecx, smg
-    mov edx, 10
-    int 0x80
+    mov rsi, 10
+    call malloc
+    
 
     mov eax, 1
     xor ebx, ebx
     int 0x80
+malloc:
+    add [_alloc], rsi
+    mov rax, [_alloc]
+    mov rdi, 0x01
+    add rsi, rdi
+    push rsi
+    mov [MEMORY+rax], rsi
+    mov rdi, 0x08
+    add rdi, rsi
+    add rax, rsi
+    mov [MEMORY+rax], rdi
+    pop rsi
+    lea rax, [MEMORY+rsi]
+    ret
