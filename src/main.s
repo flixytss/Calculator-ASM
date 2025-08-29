@@ -8,28 +8,25 @@ MEMORY: resb 1024
 
 section .text
 _start:
-    mov rsi, 2
-    call malloc
-    mov byte [rax], 0x67
+    mov rsi, 0x3
+    call put
+    mov rsi, rax
+    call copy
 
+    jmp $
 
     mov eax, 1
     xor ebx, ebx
     int 0x80
-
-malloc:
+copy:
+    mov rbx, rsi
+    mov rsi, [rbx]
+    call put
+    ret
+    
+put:
+    mov rdx, [_alloc]
+    mov [MEMORY+rdx], rsi
+    lea rax, [MEMORY+rdx]
     inc byte [_alloc]
-    mov rax, [_alloc]
-    mov rdi, 0x01
-    add rsi, rdi
-    push rsi
-    mov [MEMORY+rax], rsi
-    mov rdi, 0x08
-    add rdi, rsi
-    add rax, rsi
-    mov [MEMORY+rax], rdi
-    pop rsi
-    dec rsi
-    lea rax, [MEMORY+rsi]
-    add [_alloc], rsi
     ret
