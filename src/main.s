@@ -1,7 +1,7 @@
 ;MALLOC
 section .data
 
-_alloc: dq 0
+_alloc: dd 0
 
 section .bss
 
@@ -11,16 +11,37 @@ section .text
 _start:
     mov rsi, 4
     call malloc
-    mov rsi, 10
-    call malloc
+    movzx byte [rax], 0x41
 
-    call freeall
+    mov rsi, 0x00
+    call put
+
+    mov rsi, rax
+    mov rdi, 5
+    call realloc
 
     jmp $
 
     mov eax, 1
     xor ebx, ebx
     int 0x80
+realloc:
+    ; rsi memory; rdi size;
+    push rsi
+    mov rsi, rdi
+    call malloc
+    pop rsi
+    xor rbx, rbx
+    .loop:
+        cmp rbx, rdi
+        je .done
+        mov rdx, [rsi+rbx]
+        mov [rax+rbx], rdx
+        inc rbx
+        jmp .loop
+    .done:
+        ret
+
 copy:
     mov rbx, rsi
     mov rsi, [rbx]
@@ -41,7 +62,7 @@ malloc:
         sub rax, rsi
         ret
 put:
-    mov rdx, [_alloc]
+    movzx rdx, byte [_alloc]
     mov [MEMORY+rdx], rsi
     lea rax, [MEMORY+rdx]
     inc byte [_alloc]
