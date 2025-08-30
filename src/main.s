@@ -1,3 +1,4 @@
+;MALLOC
 section .data
 
 _alloc: dq 0
